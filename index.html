@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Twisted Tornado Dashboard</title>
+<title>Twisted Tornado Ops Dashboard</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(to bottom, #0a0a0a, #1a1f2b);
+  background: #0b0c11;
   color: #e0faff;
 }
 
@@ -21,30 +21,31 @@ header {
   font-size: 2rem;
   font-weight: 700;
   color: #00d0ff;
-  background: linear-gradient(90deg, #0b2a38, #001f2a);
+  background: #07080d;
+  border-bottom: 2px solid #00bfff;
   box-shadow: 0 4px 10px rgba(0,0,0,0.7);
 }
 
-/* Main grid */
+/* Main dashboard layout */
 .dashboard {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 20px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 20px auto;
   padding: 0 10px;
 }
 
-/* Input panel */
+/* Inputs panel */
 .inputs {
   display: grid;
   gap: 15px;
 }
 .input-card {
-  background: #182a36;
+  background: #12151f;
   padding: 15px;
   border-radius: 12px;
-  border-left: 5px solid #00d0ff;
+  border-left: 5px solid #00bfff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.7);
 }
 .input-card label {
@@ -58,7 +59,7 @@ header {
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #00bfff;
-  background: #0f1f28;
+  background: #0f1620;
   color: #d4faff;
   font-size: 1rem;
 }
@@ -88,7 +89,7 @@ header {
 
 /* EF Scale bars */
 .bar-container {
-  background: #1b2c38;
+  background: #1b1e28;
   border-radius: 8px;
   overflow: hidden;
   margin: 5px 0;
@@ -115,14 +116,27 @@ header {
   gap: 12px;
 }
 .type-card {
-  background: #182a36;
+  background: #12151f;
   flex: 1 1 45%;
   padding: 15px;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.5);
   font-weight: bold;
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+.type-icon {
+  width: 28px;
+  height: 28px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
 }
 
 /* Vehicle cards */
@@ -142,15 +156,17 @@ header {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 6px;
+  opacity: 1;
+  transition: 0.3s;
 }
 .vehicle-safe { background: #00a676; }
-.vehicle-danger { background: #d94f4f; }
+.vehicle-danger { background: #d94f4f; opacity: 0.6; }
 .vehicle-icon {
   width: 40px;
   height: 40px;
   background: rgba(255,255,255,0.2);
   border-radius: 6px;
-  margin-bottom: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -166,11 +182,11 @@ header {
 </head>
 <body>
 
-<header>Twisted Tornado Dashboard</header>
+<header>Twisted Tornado Ops Dashboard</header>
 
 <div class="dashboard">
 
-  <!-- Input panel -->
+  <!-- Inputs panel -->
   <div class="inputs">
     <div class="input-card"><label>CAPE (J/kg)</label><input type="number" id="cape" value="4904"></div>
     <div class="input-card"><label>SRH (m²/s²)</label><input type="number" id="srh" value="513"></div>
@@ -178,7 +194,7 @@ header {
     <div class="input-card"><label>Dewpoint (°F)</label><input type="number" id="dew" value="58"></div>
     <div class="input-card"><label>STP</label><input type="number" id="stp" value="11"></div>
     <div class="input-card"><label>VTP</label><input type="number" id="vtp" value="3"></div>
-    <button class="btn" onclick="calculate()">CALCULATE</button>
+    <button class="btn" onclick="calculate()">UPDATE DASHBOARD</button>
   </div>
 
   <!-- Results panel -->
@@ -197,11 +213,11 @@ header {
     <div>
       <h2>Tornado Types</h2>
       <div class="types-grid">
-        <div class="type-card" id="typeCone"></div>
-        <div class="type-card" id="typeRope"></div>
-        <div class="type-card" id="typeWedge"></div>
-        <div class="type-card" id="typeMultivortex"></div>
-        <div class="type-card" id="typeSidewinder"></div>
+        <div class="type-card" id="typeCone"><div class="type-icon">C</div>Cone</div>
+        <div class="type-card" id="typeRope"><div class="type-icon">R</div>Rope</div>
+        <div class="type-card" id="typeWedge"><div class="type-icon">W</div>Wedge</div>
+        <div class="type-card" id="typeMultivortex"><div class="type-icon">M</div>Multivortex</div>
+        <div class="type-card" id="typeSidewinder"><div class="type-icon">S</div>Sidewinder</div>
       </div>
     </div>
 
@@ -218,13 +234,13 @@ header {
 <script>
 window.onload = function() {
 
+  // Updated vehicles list
   const vehicles = [
     {name:"TIV 2", windMax:235},
     {name:"Dominator 1", windMax:170},
     {name:"Dominator 2", windMax:190},
     {name:"Dominator 3", windMax:210},
     {name:"Armadillo", windMax:220},
-    {name:"2017 BullHorn Buffalo 3500", windMax:150},
     {name:"Twister Tamer", windMax:160},
     {name:"DOW6", windMax:120}
   ];
@@ -236,7 +252,7 @@ window.onload = function() {
     const stp = Number(document.getElementById("stp").value);
     const vtp = Number(document.getElementById("vtp").value);
 
-    // EF Scale calculation
+    // EF calculation
     let strongScore = (cape/7000)*0.4 + (srh/800)*0.3 + (stp/15)*0.2 + (vtp/5)*0.1;
     let violentScore = strongScore*(lapse/10);
 
@@ -273,7 +289,8 @@ window.onload = function() {
     document.getElementById("typeMultivortex").innerText = `Multivortex: ${multivortexP}%`;
     document.getElementById("typeSidewinder").innerText = `Sidewinder: ${sidewinderP}%`;
 
-    // Vehicles
+    // Vehicle recommendation logic
+    // Higher violentP → more vehicles cannot safely intercept
     const tornadoWind = violentP*50;
     const vehiclesGrid = document.getElementById("vehiclesGrid");
     vehiclesGrid.innerHTML = "";
