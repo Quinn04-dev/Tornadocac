@@ -1,308 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Twisted Tornado Ops Dashboard</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Twisted Tornado Intelligence Dashboard</title>
 
-body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif;
-  background: #0b0c11;
-  color: #e0faff;
-}
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0e0e12;
+            color: #e6e6e6;
+        }
 
-/* Header */
-header {
-  padding: 20px;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #00d0ff;
-  background: #07080d;
-  border-bottom: 2px solid #00bfff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
-}
+        .header {
+            padding: 20px;
+            background: #14141a;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #6ec1ff;
+            border-bottom: 2px solid #1f1f29;
+        }
 
-/* Main dashboard layout */
-.dashboard {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 20px;
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 0 10px;
-}
+        .container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
 
-/* Inputs panel */
-.inputs {
-  display: grid;
-  gap: 15px;
-}
-.input-card {
-  background: #12151f;
-  padding: 15px;
-  border-radius: 12px;
-  border-left: 5px solid #00bfff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-}
-.input-card label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 700;
-  color: #7feaff;
-}
-.input-card input {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #00bfff;
-  background: #0f1620;
-  color: #d4faff;
-  font-size: 1rem;
-}
+        .section-title {
+            margin-top: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #82d1ff;
+        }
 
-/* Calculate button */
-.btn {
-  padding: 14px;
-  background: #0094c7;
-  border: none;
-  color: white;
-  border-radius: 12px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 10px;
-}
-.btn:hover { background: #00b8f0; }
+        .card {
+            background: #17171f;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid #22222e;
+            box-shadow: 0 0 10px rgba(0,0,0,0.35);
+            transition: 0.3s;
+        }
 
-/* Results panel */
-.results {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  display: none;
-}
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 18px rgba(0,0,0,0.6);
+        }
 
-/* EF Scale bars */
-.bar-container {
-  background: #1b1e28;
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 5px 0;
-}
-.bar {
-  height: 28px;
-  line-height: 28px;
-  border-radius: 8px;
-  padding-right: 8px;
-  text-align: right;
-  font-weight: bold;
-  color: white;
-  transition: width 0.6s ease;
-}
-.weak { background: #2ecc71; }
-.moderate { background: #f1c40f; }
-.strong { background: #e67e22; }
-.violent { background: #e74c3c; }
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
 
-/* Tornado type cards */
-.types-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.type-card {
-  background: #12151f;
-  flex: 1 1 45%;
-  padding: 15px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
-}
-.type-icon {
-  width: 28px;
-  height: 28px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-}
+        .input-row label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-/* Vehicle cards */
-.vehicles-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.vehicle-card {
-  flex: 1 1 45%;
-  text-align: center;
-  font-weight: bold;
-  padding: 12px;
-  border-radius: 10px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  opacity: 1;
-  transition: 0.3s;
-}
-.vehicle-safe { background: #00a676; }
-.vehicle-danger { background: #d94f4f; opacity: 0.6; }
-.vehicle-icon {
-  width: 40px;
-  height: 40px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.8rem;
-}
+        input, select {
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            background: #20202a;
+            color: #e6e6e6;
+        }
 
-/* Responsive */
-@media(max-width:900px){
-  .dashboard { grid-template-columns: 1fr; }
-  .type-card, .vehicle-card { flex: 1 1 48%; }
-}
-</style>
+        .flex {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tornado-card {
+            background: #1a1a26;
+            border-left: 6px solid #6ec1ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            animation: fadeIn 0.7s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(10px);} 
+            to {opacity: 1; transform: translateY(0);} 
+        }
+
+        .tornado-type-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #6ec1ff;
+        }
+
+        .vehicle-card {
+            background: #16161f;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 5px solid #ff6161;
+        }
+
+        .vehicle-good { border-left-color: #55ff8a !important; }
+        .vehicle-medium { border-left-color: #ffd255 !important; }
+        .vehicle-bad { border-left-color: #ff6161 !important; }
+    </style>
 </head>
+
 <body>
 
-<header>Twisted Tornado Ops Dashboard</header>
+    <div class="header">Twisted — Tornado Intelligence Dashboard</div>
 
-<div class="dashboard">
+    <div class="container">
 
-  <!-- Inputs panel -->
-  <div class="inputs">
-    <div class="input-card"><label>CAPE (J/kg)</label><input type="number" id="cape" value="4904"></div>
-    <div class="input-card"><label>SRH (m²/s²)</label><input type="number" id="srh" value="513"></div>
-    <div class="input-card"><label>Lapse Rate (°C/km)</label><input type="number" step="0.1" id="lapse" value="8.6"></div>
-    <div class="input-card"><label>Dewpoint (°F)</label><input type="number" id="dew" value="58"></div>
-    <div class="input-card"><label>STP</label><input type="number" id="stp" value="11"></div>
-    <div class="input-card"><label>VTP</label><input type="number" id="vtp" value="3"></div>
-    <button class="btn" onclick="calculate()">UPDATE DASHBOARD</button>
-  </div>
+        <div class="section-title">Input Mode</div>
+        <div class="card">
+            <label>Choose Input Type</label>
+            <select id="inputMode" onchange="toggleInputMode()">
+                <option value="manual">Manual Entry</option>
+                <option value="risk">Select SPC‑Style Risk Level</option>
+                <option value="both">Both</option>
+            </select>
+        </div>
 
-  <!-- Results panel -->
-  <div class="results" id="resultsPanel">
+        <div id="manualInputs" class="card">
+            <div class="section-title">Manual Atmospheric Inputs</div>
+            <div class="input-row">
+                <label>CAPE (J/kg)</label>
+                <input type="number" id="cape" placeholder="Example: 2500" />
+            </div>
+            <div class="input-row">
+                <label>0–1 km Shear (kt)</label>
+                <input type="number" id="shear" placeholder="Example: 30" />
+            </div>
+            <div class="input-row">
+                <label>LCL Height (m)</label>
+                <input type="number" id="lcl" placeholder="Example: 900" />
+            </div>
+            <div class="input-row">
+                <label>Storm Motion (kt)</label>
+                <input type="number" id="stormMotion" placeholder="Example: 32" />
+            </div>
+        </div>
 
-    <!-- EF Scale -->
-    <div>
-      <h2>EF-Scale Probabilities</h2>
-      <div class="bar-container"><div id="barWeak" class="bar weak"></div></div>
-      <div class="bar-container"><div id="barModerate" class="bar moderate"></div></div>
-      <div class="bar-container"><div id="barStrong" class="bar strong"></div></div>
-      <div class="bar-container"><div id="barViolent" class="bar violent"></div></div>
+        <div id="riskInputs" class="card" style="display:none;">
+            <div class="section-title">SPC‑Like Risk Selector</div>
+            <select id="riskLevel">
+                <option value="marginal">Marginal</option>
+                <option value="slight">Slight</option>
+                <option value="enhanced">Enhanced</option>
+                <option value="moderate">Moderate</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+
+        <button onclick="calculateTornado()" style="margin-top:20px;padding:12px 24px;border-radius:8px;background:#6ec1ff;border:none;font-size:16px;cursor:pointer;color:#000;font-weight:bold;">Analyze</button>
+
+        <div id="tornadoResult"></div>
+        <div id="vehicleResult"></div>
+
     </div>
-
-    <!-- Tornado types -->
-    <div>
-      <h2>Tornado Types</h2>
-      <div class="types-grid">
-        <div class="type-card" id="typeCone"><div class="type-icon">C</div>Cone</div>
-        <div class="type-card" id="typeRope"><div class="type-icon">R</div>Rope</div>
-        <div class="type-card" id="typeWedge"><div class="type-icon">W</div>Wedge</div>
-        <div class="type-card" id="typeMultivortex"><div class="type-icon">M</div>Multivortex</div>
-        <div class="type-card" id="typeSidewinder"><div class="type-icon">S</div>Sidewinder</div>
-      </div>
-    </div>
-
-    <!-- Vehicles -->
-    <div>
-      <h2>Recommended Vehicles</h2>
-      <div class="vehicles-grid" id="vehiclesGrid"></div>
-    </div>
-
-  </div>
-
-</div>
 
 <script>
-window.onload = function() {
+function toggleInputMode() {
+    let mode = document.getElementById("inputMode").value;
 
-  // Updated vehicles list
-  const vehicles = [
-    {name:"TIV 2", windMax:235},
-    {name:"Dominator 1", windMax:170},
-    {name:"Dominator 2", windMax:190},
-    {name:"Dominator 3", windMax:210},
-    {name:"Armadillo", windMax:220},
-    {name:"Twister Tamer", windMax:160},
-    {name:"DOW6", windMax:120}
-  ];
+    document.getElementById("manualInputs").style.display =
+        (mode === "manual" || mode === "both") ? "block" : "none";
 
-  window.calculate = function() {
-    const cape = Number(document.getElementById("cape").value);
-    const srh = Number(document.getElementById("srh").value);
-    const lapse = Number(document.getElementById("lapse").value);
-    const stp = Number(document.getElementById("stp").value);
-    const vtp = Number(document.getElementById("vtp").value);
+    document.getElementById("riskInputs").style.display =
+        (mode === "risk" || mode === "both") ? "block" : "none";
+}
 
-    // EF calculation
-    let strongScore = (cape/7000)*0.4 + (srh/800)*0.3 + (stp/15)*0.2 + (vtp/5)*0.1;
-    let violentScore = strongScore*(lapse/10);
+// Vehicle list for TWISTED (curated, no 2017 Buffalo)
+const vehicles = [
+    { name: "Interceptor V1", tier: 1 },
+    { name: "Interceptor V2", tier: 2 },
+    { name: "Dominator‑Style Rig", tier: 3 },
+    { name: "Armored Scout", tier: 1 },
+    { name: "Rapid Response SUV", tier: 2 },
+    { name: "Heavy Armored Tank", tier: 4 }
+];
 
-    let weakP = Math.max(0,20-strongScore*20);
-    let moderateP = Math.max(0,20+strongScore*10);
-    let strongP = Math.min(90, strongScore*55);
-    let violentP = Math.min(80, violentScore*45);
+function classifyTornado(score) {
+    if (score < 20) return "Weak Rope";
+    if (score < 35) return "Cone";
+    if (score < 55) return "Stovepipe";
+    if (score < 70) return "Wedge";
+    return "Violent Multi‑Vortex";
+}
 
-    let total = weakP+moderateP+strongP+violentP;
-    weakP = Math.round((weakP/total)*100);
-    moderateP = Math.round((moderateP/total)*100);
-    strongP = Math.round((strongP/total)*100);
-    violentP = Math.round((violentP/total)*100);
+function calculateTornado() {
+    let mode = document.getElementById("inputMode").value;
+    let score = 0;
 
-    document.getElementById("barWeak").style.width = weakP+"%";
-    document.getElementById("barWeak").innerText = `Weak: ${weakP}%`;
-    document.getElementById("barModerate").style.width = moderateP+"%";
-    document.getElementById("barModerate").innerText = `Moderate: ${moderateP}%`;
-    document.getElementById("barStrong").style.width = strongP+"%";
-    document.getElementById("barStrong").innerText = `Strong: ${strongP}%`;
-    document.getElementById("barViolent").style.width = violentP+"%";
-    document.getElementById("barViolent").innerText = `Violent: ${violentP}%`;
+    if (mode === "manual" || mode === "both") {
+        let cape = Number(document.getElementById("cape").value);
+        let shear = Number(document.getElementById("shear" ).value);
+        let lcl = Number(document.getElementById("lcl"  ).value);
+        let storm = Number(document.getElementById("stormMotion").value);
 
-    // Tornado types
-    const coneP = Math.round(strongScore*40);
-    const ropeP = Math.round((1-strongScore)*30);
-    const wedgeP = Math.round(strongScore*35);
-    const multivortexP = Math.round(violentScore*30);
-    const sidewinderP = Math.round(violentScore*20);
+        score += cape / 100;
+        score += shear * 1.2;
+        score += (1500 - lcl) / 60;
+        score += storm * 0.8;
+    }
 
-    document.getElementById("typeCone").innerText = `Cone: ${coneP}%`;
-    document.getElementById("typeRope").innerText = `Rope: ${ropeP}%`;
-    document.getElementById("typeWedge").innerText = `Wedge: ${wedgeP}%`;
-    document.getElementById("typeMultivortex").innerText = `Multivortex: ${multivortexP}%`;
-    document.getElementById("typeSidewinder").innerText = `Sidewinder: ${sidewinderP}%`;
+    if (mode === "risk" || mode === "both") {
+        let risk = document.getElementById("riskLevel").value;
+        const riskScores = {
+            marginal: 15,
+            slight: 25,
+            enhanced: 40,
+            moderate: 60,
+            high: 80
+        };
+        score += riskScores[risk];
+    }
 
-    // Vehicle recommendation logic
-    // Higher violentP → more vehicles cannot safely intercept
-    const tornadoWind = violentP*50;
-    const vehiclesGrid = document.getElementById("vehiclesGrid");
-    vehiclesGrid.innerHTML = "";
-    vehicles.forEach(v=>{
-      const div = document.createElement("div");
-      div.className = "vehicle-card " + (tornadoWind <= v.windMax ? "vehicle-safe" : "vehicle-danger");
-      div.innerHTML = `<div class="vehicle-icon">${v.name[0]}</div>${v.name}`;
-      vehiclesGrid.appendChild(div);
+    score = Math.max(0, Math.min(score, 100));
+    let torType = classifyTornado(score);
+
+    document.getElementById("tornadoResult").innerHTML = `
+        <div class='tornado-card'>
+            <div class='tornado-type-title'>${torType}</div>
+            <div><b>Threat Score:</b> ${score.toFixed(1)} / 100</div>
+        </div>
+    `;
+
+    let vHTML = "<div class='section-title'>Vehicle Intercept Capability</div>";
+
+    vehicles.forEach(v => {
+        let allowed = (v.tier * 20 >= score);
+        let rating = allowed ? "vehicle-good" : (v.tier * 15 >= score ? "vehicle-medium" : "vehicle-bad");
+
+        vHTML += `
+            <div class='vehicle-card ${rating}'>
+                <b>${v.name}</b><br>
+                Capability: ${allowed ? "Usable" : "Unsafe"}
+            </div>
+        `;
     });
 
-    document.getElementById("resultsPanel").style.display = "flex";
-  }
+    document.getElementById("vehicleResult").innerHTML = vHTML;
 }
 </script>
 
