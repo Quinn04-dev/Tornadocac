@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twisted Tornado Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(to bottom, #0a0a0a, #1a1f2b);
+  color: #e0faff;
+}
+
+/* Header */
+header {
+  padding: 20px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00d0ff;
+  background: linear-gradient(90deg, #0b2a38, #001f2a);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+}
+
+/* Main grid */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 0 10px;
+}
+
+/* Input panel */
+.inputs {
+  display: grid;
+  gap: 15px;
+}
+.input-card {
+  background: #182a36;
+  padding: 15px;
+  border-radius: 12px;
+  border-left: 5px solid #00d0ff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}
+.input-card label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: #7feaff;
+}
+.input-card input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #00bfff;
+  background: #0f1f28;
+  color: #d4faff;
+  font-size: 1rem;
+}
+
+/* Calculate button */
+.btn {
+  padding: 14px;
+  background: #0094c7;
+  border: none;
+  color: white;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+.btn:hover { background: #00b8f0; }
+
+/* Results panel */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  display: none;
+}
+
+/* EF Scale bars */
+.bar-container {
+  background: #1b2c38;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 5px 0;
+}
+.bar {
+  height: 28px;
+  line-height: 28px;
+  border-radius: 8px;
+  padding-right: 8px;
+  text-align: right;
+  font-weight: bold;
+  color: white;
+  transition: width 0.6s ease;
+}
+.weak { background: #2ecc71; }
+.moderate { background: #f1c40f; }
+.strong { background: #e67e22; }
+.violent { background: #e74c3c; }
+
+/* Tornado type cards */
+.types-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.type-card {
+  background: #182a36;
+  flex: 1 1 45%;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* Vehicle cards */
+.vehicles-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.vehicle-card {
+  flex: 1 1 45%;
+  text-align: center;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.vehicle-safe { background: #00a676; }
+.vehicle-danger { background: #d94f4f; }
+.vehicle-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+/* Responsive */
+@media(max-width:900px){
+  .dashboard { grid-template-columns: 1fr; }
+  .type-card, .vehicle-card { flex: 1 1 48%; }
+}
+</style>
+</head>
+<body>
+
+<header>Twisted Tornado Dashboard</header>
+
+<div class="dashboard">
+
+  <!-- Input panel -->
+  <div class="inputs">
+    <div class="input-card"><label>CAPE (J/kg)</label><input type="number" id="cape" value="4904"></div>
+    <div class="input-card"><label>SRH (m²/s²)</label><input type="number" id="srh" value="513"></div>
+    <div class="input-card"><label>Lapse Rate (°C/km)</label><input type="number" step="0.1" id="lapse" value="8.6"></div>
+    <div class="input-card"><label>Dewpoint (°F)</label><input type="number" id="dew" value="58"></div>
+    <div class="input-card"><label>STP</label><input type="number" id="stp" value="11"></div>
+    <div class="input-card"><label>VTP</label><input type="number" id="vtp" value="3"></div>
+    <button class="btn" onclick="calculate()">CALCULATE</button>
+  </div>
+
+  <!-- Results panel -->
+  <div class="results" id="resultsPanel">
+
+    <!-- EF Scale -->
+    <div>
+      <h2>EF-Scale Probabilities</h2>
+      <div class="bar-container"><div id="barWeak" class="bar weak"></div></div>
+      <div class="bar-container"><div id="barModerate" class="bar moderate"></div></div>
+      <div class="bar-container"><div id="barStrong" class="bar strong"></div></div>
+      <div class="bar-container"><div id="barViolent" class="bar violent"></div></div>
+    </div>
+
+    <!-- Tornado types -->
+    <div>
+      <h2>Tornado Types</h2>
+      <div class="types-grid">
+        <div class="type-card" id="typeCone"></div>
+        <div class="type-card" id="typeRope"></div>
+        <div class="type-card" id="typeWedge"></div>
+        <div class="type-card" id="typeMultivortex"></div>
+        <div class="type-card" id="typeSidewinder"></div>
+      </div>
+    </div>
+
+    <!-- Vehicles -->
+    <div>
+      <h2>Recommended Vehicles</h2>
+      <div class="vehicles-grid" id="vehiclesGrid"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+window.onload = function() {
+
+  const vehicles = [
+    {name:"TIV 2", windMax:235},
+    {name:"Dominator 1", windMax:170},
+    {name:"Dominator 2", windMax:190},
+    {name:"Dominator 3", windMax:210},
+    {name:"Armadillo", windMax:220},
+    {name:"2017 BullHorn Buffalo 3500", windMax:150},
+    {name:"Twister Tamer", windMax:160},
+    {name:"DOW6", windMax:120}
+  ];
+
+  window.calculate = function() {
+    const cape = Number(document.getElementById("cape").value);
+    const srh = Number(document.getElementById("srh").value);
+    const lapse = Number(document.getElementById("lapse").value);
+    const stp = Number(document.getElementById("stp").value);
+    const vtp = Number(document.getElementById("vtp").value);
+
+    // EF Scale calculation
+    let strongScore = (cape/7000)*0.4 + (srh/800)*0.3 + (stp/15)*0.2 + (vtp/5)*0.1;
+    let violentScore = strongScore*(lapse/10);
+
+    let weakP = Math.max(0,20-strongScore*20);
+    let moderateP = Math.max(0,20+strongScore*10);
+    let strongP = Math.min(90, strongScore*55);
+    let violentP = Math.min(80, violentScore*45);
+
+    let total = weakP+moderateP+strongP+violentP;
+    weakP = Math.round((weakP/total)*100);
+    moderateP = Math.round((moderateP/total)*100);
+    strongP = Math.round((strongP/total)*100);
+    violentP = Math.round((violentP/total)*100);
+
+    document.getElementById("barWeak").style.width = weakP+"%";
+    document.getElementById("barWeak").innerText = `Weak: ${weakP}%`;
+    document.getElementById("barModerate").style.width = moderateP+"%";
+    document.getElementById("barModerate").innerText = `Moderate: ${moderateP}%`;
+    document.getElementById("barStrong").style.width = strongP+"%";
+    document.getElementById("barStrong").innerText = `Strong: ${strongP}%`;
+    document.getElementById("barViolent").style.width = violentP+"%";
+    document.getElementById("barViolent").innerText = `Violent: ${violentP}%`;
+
+    // Tornado types
+    const coneP = Math.round(strongScore*40);
+    const ropeP = Math.round((1-strongScore)*30);
+    const wedgeP = Math.round(strongScore*35);
+    const multivortexP = Math.round(violentScore*30);
+    const sidewinderP = Math.round(violentScore*20);
+
+    document.getElementById("typeCone").innerText = `Cone: ${coneP}%`;
+    document.getElementById("typeRope").innerText = `Rope: ${ropeP}%`;
+    document.getElementById("typeWedge").innerText = `Wedge: ${wedgeP}%`;
+    document.getElementById("typeMultivortex").innerText = `Multivortex: ${multivortexP}%`;
+    document.getElementById("typeSidewinder").innerText = `Sidewinder: ${sidewinderP}%`;
+
+    // Vehicles
+    const tornadoWind = violentP*50;
+    const vehiclesGrid = document.getElementById("vehiclesGrid");
+    vehiclesGrid.innerHTML = "";
+    vehicles.forEach(v=>{
+      const div = document.createElement("div");
+      div.className = "vehicle-card " + (tornadoWind <= v.windMax ? "vehicle-safe" : "vehicle-danger");
+      div.innerHTML = `<div class="vehicle-icon">${v.name[0]}</div>${v.name}`;
+      vehiclesGrid.appendChild(div);
+    });
+
+    document.getElementById("resultsPanel").style.display = "flex";
+  }
+}
+</script>
+
+</body>
+</html>
