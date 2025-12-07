@@ -1,252 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Twisted Tornado Intelligence Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twisted Funnel Type Calculator</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0e0e12;
-            color: #e6e6e6;
-        }
+<style>
+    body {
+        background:#0c0e15;
+        font-family:Arial, sans-serif;
+        color:white;
+        margin:0;
+        padding:15px;
+    }
 
-        .header {
-            padding: 20px;
-            background: #14141a;
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            color: #6ec1ff;
-            border-bottom: 2px solid #1f1f29;
-        }
+    /* HEADER */
+    .header {
+        text-align:left;
+        font-size:26px;
+        font-weight:bold;
+        color:white;
+        margin-bottom:20px;
+    }
 
-        .container {
-            padding: 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
+    /* CATEGORY TABS */
+    .category-row {
+        display:flex;
+        gap:10px;
+        margin-bottom:20px;
+    }
 
-        .section-title {
-            margin-top: 25px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #82d1ff;
-        }
+    .category {
+        background:#191c27;
+        padding:10px 15px;
+        border-radius:14px;
+        font-size:14px;
+        color:#8aa0ff;
+        border:1px solid #2b3147;
+        box-shadow:0 0 6px #1d2233 inset;
+    }
 
-        .card {
-            background: #17171f;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 15px;
-            border: 1px solid #22222e;
-            box-shadow: 0 0 10px rgba(0,0,0,0.35);
-            transition: 0.3s;
-        }
+    .category.highlight {
+        color:#ff6edb;
+        font-weight:bold;
+    }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 0 18px rgba(0,0,0,0.6);
-        }
+    /* MAIN CARD */
+    .card {
+        background:#161925;
+        padding:20px;
+        border-radius:20px;
+        box-shadow:0 0 12px #000;
+        margin-bottom:20px;
+    }
 
-        .input-row {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-        }
+    label {
+        display:block;
+        margin-top:14px;
+        font-size:14px;
+        color:#c6ceff;
+    }
 
-        .input-row label {
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+    input {
+        width:100%;
+        padding:10px;
+        border:none;
+        border-radius:10px;
+        margin-top:6px;
+        background:#1f2333;
+        color:white;
+        font-size:16px;
+    }
 
-        input, select {
-            padding: 10px;
-            border-radius: 6px;
-            border: none;
-            background: #20202a;
-            color: #e6e6e6;
-        }
+    button {
+        width:100%;
+        padding:14px;
+        margin-top:25px;
+        background:#4e5cff;
+        color:white;
+        border:none;
+        border-radius:14px;
+        font-size:18px;
+        font-weight:bold;
+        box-shadow:0 0 10px #4e5cff;
+    }
 
-        .flex {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .tornado-card {
-            background: #1a1a26;
-            border-left: 6px solid #6ec1ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            animation: fadeIn 0.7s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(10px);} 
-            to {opacity: 1; transform: translateY(0);} 
-        }
-
-        .tornado-type-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #6ec1ff;
-        }
-
-        .vehicle-card {
-            background: #16161f;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 5px solid #ff6161;
-        }
-
-        .vehicle-good { border-left-color: #55ff8a !important; }
-        .vehicle-medium { border-left-color: #ffd255 !important; }
-        .vehicle-bad { border-left-color: #ff6161 !important; }
-    </style>
+    /* RESULT PANEL */
+    .result {
+        background:#10131d;
+        padding:20px;
+        border-radius:16px;
+        font-size:22px;
+        text-align:center;
+        box-shadow:0 0 10px #000;
+        margin-top:20px;
+    }
+</style>
 </head>
 
 <body>
 
-    <div class="header">Twisted — Tornado Intelligence Dashboard</div>
+<div class="header">Thermodynamics</div>
 
-    <div class="container">
+<div class="category-row">
+    <div class="category highlight">HIGH</div>
+    <div class="category">MRGL</div>
+    <div class="category">MRGL</div>
+</div>
 
-        <div class="section-title">Input Mode</div>
-        <div class="card">
-            <label>Choose Input Type</label>
-            <select id="inputMode" onchange="toggleInputMode()">
-                <option value="manual">Manual Entry</option>
-                <option value="risk">Select SPC‑Style Risk Level</option>
-                <option value="both">Both</option>
-            </select>
-        </div>
+<div class="card">
+    <label>Temperature (°F)</label>
+    <input id="temp" type="number">
 
-        <div id="manualInputs" class="card">
-            <div class="section-title">Manual Atmospheric Inputs</div>
-            <div class="input-row">
-                <label>CAPE (J/kg)</label>
-                <input type="number" id="cape" placeholder="Example: 2500" />
-            </div>
-            <div class="input-row">
-                <label>0–1 km Shear (kt)</label>
-                <input type="number" id="shear" placeholder="Example: 30" />
-            </div>
-            <div class="input-row">
-                <label>LCL Height (m)</label>
-                <input type="number" id="lcl" placeholder="Example: 900" />
-            </div>
-            <div class="input-row">
-                <label>Storm Motion (kt)</label>
-                <input type="number" id="stormMotion" placeholder="Example: 32" />
-            </div>
-        </div>
+    <label>Dewpoint (°F)</label>
+    <input id="dew" type="number">
 
-        <div id="riskInputs" class="card" style="display:none;">
-            <div class="section-title">SPC‑Like Risk Selector</div>
-            <select id="riskLevel">
-                <option value="marginal">Marginal</option>
-                <option value="slight">Slight</option>
-                <option value="enhanced">Enhanced</option>
-                <option value="moderate">Moderate</option>
-                <option value="high">High</option>
-            </select>
-        </div>
+    <label>CAPE (J/kg)</label>
+    <input id="cape" type="number">
 
-        <button onclick="calculateTornado()" style="margin-top:20px;padding:12px 24px;border-radius:8px;background:#6ec1ff;border:none;font-size:16px;cursor:pointer;color:#000;font-weight:bold;">Analyze</button>
+    <label>3CAPE (J/kg)</label>
+    <input id="cape3" type="number">
 
-        <div id="tornadoResult"></div>
-        <div id="vehicleResult"></div>
+    <label>0–3km Lapse Rate (°C/km)</label>
+    <input id="lap03" type="number">
 
-    </div>
+    <label>3–6km Lapse Rate (°C/km)</label>
+    <input id="lap36" type="number">
+
+    <label>PWAT (in)</label>
+    <input id="pwat" type="number">
+
+    <label>SRH (m²/s²)</label>
+    <input id="srh" type="number">
+
+    <label>Surface RH (%)</label>
+    <input id="rh" type="number">
+
+    <label>STP</label>
+    <input id="stp" type="number">
+
+    <label>VTP</label>
+    <input id="vtp" type="number">
+
+    <button onclick="calculate()">Predict Funnel Type</button>
+
+    <div id="output" class="result"></div>
+</div>
 
 <script>
-function toggleInputMode() {
-    let mode = document.getElementById("inputMode").value;
+function calculate() {
+    let cape = Number(cape.value);
+    let srh  = Number(srh.value);
+    let stpV = Number(stp.value);
+    let rhV  = Number(rh.value);
+    let lap  = Number(lap03.value);
+    let cape3v = Number(cape3.value);
+    let vtp = Number(vtp.value);
 
-    document.getElementById("manualInputs").style.display =
-        (mode === "manual" || mode === "both") ? "block" : "none";
+    let funnel = "Unknown";
 
-    document.getElementById("riskInputs").style.display =
-        (mode === "risk" || mode === "both") ? "block" : "none";
-}
-
-// Vehicle list for TWISTED (curated, no 2017 Buffalo)
-const vehicles = [
-    { name: "Interceptor V1", tier: 1 },
-    { name: "Interceptor V2", tier: 2 },
-    { name: "Dominator‑Style Rig", tier: 3 },
-    { name: "Armored Scout", tier: 1 },
-    { name: "Rapid Response SUV", tier: 2 },
-    { name: "Heavy Armored Tank", tier: 4 }
-];
-
-function classifyTornado(score) {
-    if (score < 20) return "Weak Rope";
-    if (score < 35) return "Cone";
-    if (score < 55) return "Stovepipe";
-    if (score < 70) return "Wedge";
-    return "Violent Multi‑Vortex";
-}
-
-function calculateTornado() {
-    let mode = document.getElementById("inputMode").value;
-    let score = 0;
-
-    if (mode === "manual" || mode === "both") {
-        let cape = Number(document.getElementById("cape").value);
-        let shear = Number(document.getElementById("shear" ).value);
-        let lcl = Number(document.getElementById("lcl"  ).value);
-        let storm = Number(document.getElementById("stormMotion").value);
-
-        score += cape / 100;
-        score += shear * 1.2;
-        score += (1500 - lcl) / 60;
-        score += storm * 0.8;
+    // --- Twisted-Style Funnel Prediction Logic ---
+    if (cape > 4500 && srh > 400 && stpV > 7 && vtp > 2) {
+        funnel = "Wedge Tornado";
+    }
+    else if (cape > 3200 && srh > 250 && stpV > 4) {
+        funnel = "Stovepipe Tornado";
+    }
+    else if (cape > 2500 && cape3v > 200 && srh > 150) {
+        funnel = "Cone Tornado";
+    }
+    else if (srh > 500 && stpV > 3) {
+        funnel = "Multi-Vortex Tornado";
+    }
+    else if (cape > 1800 && lap > 7.5 && rhV < 60) {
+        funnel = "Rope Tornado";
+    }
+    else if (cape < 800 && rhV < 50) {
+        funnel = "Landspout";
+    }
+    else {
+        funnel = "Weak Rope / Unknown";
     }
 
-    if (mode === "risk" || mode === "both") {
-        let risk = document.getElementById("riskLevel").value;
-        const riskScores = {
-            marginal: 15,
-            slight: 25,
-            enhanced: 40,
-            moderate: 60,
-            high: 80
-        };
-        score += riskScores[risk];
-    }
-
-    score = Math.max(0, Math.min(score, 100));
-    let torType = classifyTornado(score);
-
-    document.getElementById("tornadoResult").innerHTML = `
-        <div class='tornado-card'>
-            <div class='tornado-type-title'>${torType}</div>
-            <div><b>Threat Score:</b> ${score.toFixed(1)} / 100</div>
-        </div>
-    `;
-
-    let vHTML = "<div class='section-title'>Vehicle Intercept Capability</div>";
-
-    vehicles.forEach(v => {
-        let allowed = (v.tier * 20 >= score);
-        let rating = allowed ? "vehicle-good" : (v.tier * 15 >= score ? "vehicle-medium" : "vehicle-bad");
-
-        vHTML += `
-            <div class='vehicle-card ${rating}'>
-                <b>${v.name}</b><br>
-                Capability: ${allowed ? "Usable" : "Unsafe"}
-            </div>
-        `;
-    });
-
-    document.getElementById("vehicleResult").innerHTML = vHTML;
+    output.innerHTML =
+        "Predicted Funnel Type:<br><strong style='color:#7da8ff'>" + funnel + "</strong>";
 }
 </script>
 
