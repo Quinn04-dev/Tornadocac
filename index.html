@@ -3,189 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Twisted Funnel Type Calculator</title>
-
+<title>Twisted Funnel + Vehicle Advisor</title>
 <style>
-    body {
-        background:#0c0e15;
-        font-family:Arial, sans-serif;
-        color:white;
-        margin:0;
-        padding:15px;
-    }
-
-    /* HEADER */
-    .header {
-        text-align:left;
-        font-size:26px;
-        font-weight:bold;
-        color:white;
-        margin-bottom:20px;
-    }
-
-    /* CATEGORY TABS */
-    .category-row {
-        display:flex;
-        gap:10px;
-        margin-bottom:20px;
-    }
-
-    .category {
-        background:#191c27;
-        padding:10px 15px;
-        border-radius:14px;
-        font-size:14px;
-        color:#8aa0ff;
-        border:1px solid #2b3147;
-        box-shadow:0 0 6px #1d2233 inset;
-    }
-
-    .category.highlight {
-        color:#ff6edb;
-        font-weight:bold;
-    }
-
-    /* MAIN CARD */
-    .card {
-        background:#161925;
-        padding:20px;
-        border-radius:20px;
-        box-shadow:0 0 12px #000;
-        margin-bottom:20px;
-    }
-
-    label {
-        display:block;
-        margin-top:14px;
-        font-size:14px;
-        color:#c6ceff;
-    }
-
-    input {
-        width:100%;
-        padding:10px;
-        border:none;
-        border-radius:10px;
-        margin-top:6px;
-        background:#1f2333;
-        color:white;
-        font-size:16px;
-    }
-
-    button {
-        width:100%;
-        padding:14px;
-        margin-top:25px;
-        background:#4e5cff;
-        color:white;
-        border:none;
-        border-radius:14px;
-        font-size:18px;
-        font-weight:bold;
-        box-shadow:0 0 10px #4e5cff;
-    }
-
-    /* RESULT PANEL */
-    .result {
-        background:#10131d;
-        padding:20px;
-        border-radius:16px;
-        font-size:22px;
-        text-align:center;
-        box-shadow:0 0 10px #000;
-        margin-top:20px;
-    }
+  body { background:#0c0e15; color:white; font-family:Arial, sans-serif; padding:15px; }
+  h1 { text-align:center; color:#7da8ff; margin-bottom:20px; }
+  .card { background:#161925; padding:20px; border-radius:16px; margin-bottom:20px; box-shadow:0 0 12px #000; }
+  label { display:block; margin-top:14px; font-size:14px; color:#c6ceff; }
+  input { width:100%; padding:10px; margin-top:6px; border:none; border-radius:10px; background:#1f2333; color:white; font-size:16px; }
+  button { width:100%; padding:14px; margin-top:25px; background:#4e5cff; border:none; border-radius:14px; font-size:18px; font-weight:bold; box-shadow:0 0 10px #4e5cff; }
+  .result { background:#10131d; padding:20px; border-radius:16px; font-size:18px; text-align:center; box-shadow:0 0 10px #000; }
+  .veh-list { text-align:left; margin-top:10px; }
+  .veh-tier { color:#7aa8ff; font-weight:bold; }
 </style>
 </head>
-
 <body>
-
-<div class="header">Thermodynamics</div>
-
-<div class="category-row">
-    <div class="category highlight">HIGH</div>
-    <div class="category">MRGL</div>
-    <div class="category">MRGL</div>
-</div>
-
-<div class="card">
-    <label>Temperature (°F)</label>
-    <input id="temp" type="number">
-
-    <label>Dewpoint (°F)</label>
-    <input id="dew" type="number">
-
-    <label>CAPE (J/kg)</label>
-    <input id="cape" type="number">
-
-    <label>3CAPE (J/kg)</label>
-    <input id="cape3" type="number">
-
-    <label>0–3km Lapse Rate (°C/km)</label>
-    <input id="lap03" type="number">
-
-    <label>3–6km Lapse Rate (°C/km)</label>
-    <input id="lap36" type="number">
-
-    <label>PWAT (in)</label>
-    <input id="pwat" type="number">
-
-    <label>SRH (m²/s²)</label>
-    <input id="srh" type="number">
-
-    <label>Surface RH (%)</label>
-    <input id="rh" type="number">
-
-    <label>STP</label>
-    <input id="stp" type="number">
-
-    <label>VTP</label>
-    <input id="vtp" type="number">
-
-    <button onclick="calculate()">Predict Funnel Type</button>
-
+  <h1>Twisted Funnel & Vehicle Advisor</h1>
+  <div class="card">
+    <label>Temperature (°F)</label><input id="temp" type="number">
+    <label>Dewpoint (°F)</label><input id="dew" type="number">
+    <label>CAPE (J/kg)</label><input id="cape" type="number">
+    <label>3CAPE (J/kg)</label><input id="cape3" type="number">
+    <label>0–3km Lapse Rate (°C/km)</label><input id="lap03" type="number">
+    <label>3–6km Lapse Rate (°C/km)</label><input id="lap36" type="number">
+    <label>PWAT (in)</label><input id="pwat" type="number" step="0.1">
+    <label>SRH (m²/s²)</label><input id="srh" type="number">
+    <label>Surface RH (%)</label><input id="rh" type="number">
+    <label>STP</label><input id="stp" type="number" step="0.1">
+    <label>VTP</label><input id="vtp" type="number" step="0.1">
+    <button onclick="advise()">Get Funnel + Vehicle Advice</button>
     <div id="output" class="result"></div>
-</div>
+  </div>
 
 <script>
-function calculate() {
-    let cape = Number(cape.value);
-    let srh  = Number(srh.value);
-    let stpV = Number(stp.value);
-    let rhV  = Number(rh.value);
-    let lap  = Number(lap03.value);
-    let cape3v = Number(cape3.value);
-    let vtp = Number(vtp.value);
+function advise() {
+  const cape = Number(cape.value);
+  const srh = Number(srh.value);
+  const stpV = Number(stp.value);
+  const rhV = Number(rh.value);
+  const lap = Number(lap03.value);
+  const cape3v = Number(cape3.value);
+  const vtp = Number(vtp.value);
 
-    let funnel = "Unknown";
+  let funnel = "Unknown";
+  // funnel logic (heuristic)
+  if (cape > 4500 && srh > 400 && stpV > 7 && vtp > 2) funnel = "Wedge";
+  else if (cape > 3200 && srh > 250 && stpV > 4) funnel = "Stovepipe";
+  else if (cape > 2500 && cape3v > 200 && srh > 150) funnel = "Cone";
+  else if (srh > 500 && stpV > 3) funnel = "Multi-Vortex";
+  else if (cape > 1800 && lap > 7.5 && rhV < 60) funnel = "Rope";
+  else if (cape < 800 && rhV < 50) funnel = "Landspout / Weak";
+  else funnel = "Weak / Unstable";
 
-    // --- Twisted-Style Funnel Prediction Logic ---
-    if (cape > 4500 && srh > 400 && stpV > 7 && vtp > 2) {
-        funnel = "Wedge Tornado";
-    }
-    else if (cape > 3200 && srh > 250 && stpV > 4) {
-        funnel = "Stovepipe Tornado";
-    }
-    else if (cape > 2500 && cape3v > 200 && srh > 150) {
-        funnel = "Cone Tornado";
-    }
-    else if (srh > 500 && stpV > 3) {
-        funnel = "Multi-Vortex Tornado";
-    }
-    else if (cape > 1800 && lap > 7.5 && rhV < 60) {
-        funnel = "Rope Tornado";
-    }
-    else if (cape < 800 && rhV < 50) {
-        funnel = "Landspout";
-    }
-    else {
-        funnel = "Weak Rope / Unknown";
-    }
+  // vehicle advice tiers
+  let safe = [], risky = [], avoid = [];
 
-    output.innerHTML =
-        "Predicted Funnel Type:<br><strong style='color:#7da8ff'>" + funnel + "</strong>";
+  if (["Wedge","Multi-Vortex"].includes(funnel)) {
+    safe.push("TIV-2, Dominator 2 (heavy interceptors)");
+    risky.push("Basic Dealership / Unarmored vehicles — **avoid**");
+    avoid.push("Civilians & pickups with low wind-threshold");
+  } else if (["Stovepipe","Cone"].includes(funnel)) {
+    safe.push("Mid-tier interceptors or heavy pickups with mesonet (if upgraded)");
+    risky.push("Light civilian vehicles — only for probes / distance-observing");
+    avoid.push("Driving directly through strong core");
+  } else if (["Rope","Landspout / Weak","Weak / Unstable"].includes(funnel)) {
+    safe.push("Standard dealership or pickup cars (fast travel / probe placement)");
+    risky.push("Interceptors — overkill but okay");
+  } else {
+    risky.push("Use probes or radar — avoid intercepting");
+  }
+
+  document.getElementById('output').innerHTML = 
+    "Predicted Funnel Type: <strong style='color:#7da8ff'>" + funnel + "</strong><br><br>" +
+    "<span class='veh-tier'>Recommended Vehicle Strategy:</span><br>" +
+    "- Safe for intercept/drive-near: " + (safe.length ? safe.join(", ") : "None") + "<br>" +
+    "- Risky (use only for probe placement or stay away): " + (risky.length ? risky.join(", ") : "None") + "<br>" +
+    "- Avoid driving near: " + (avoid.length ? avoid.join(", ") : "None");
 }
 </script>
-
 </body>
 </html>
